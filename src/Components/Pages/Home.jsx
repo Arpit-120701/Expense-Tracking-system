@@ -4,40 +4,42 @@ import axios from 'axios'
 import Spinne from '../Layout/Spinne'
 import moment from 'moment'
 import {DatePicker, Modal , Form , Input, Select, message, Table } from 'antd'
+import { UnorderedListOutlined , AreaChartOutlined} from '@ant-design/icons' 
+import Analytics from '../Layout/Analytics'
 const { RangePicker } = DatePicker;
 
 function Home() {
-  const [ showModal , setShowModal ] = useState(false)
-  const [ loading , setLoading ] = useState(false)
-  const [ allTransaction , setAllTransaction  ] = useState()
+  const [ showModal , setShowModal ] = useState(false);
+  const [ loading , setLoading ] = useState(false);
+  const [ allTransaction , setAllTransaction  ] = useState([]);
   const [ frequency , setFrequency ] = useState("7")
   const [ selectedDate , setSelectedDate ] = useState([])
-  const [ type , setType] = useState('All')
+  const [ type , setType] = useState('all')
+  const [ viewData , setViewData ] = useState('table')
   const columns = [
     {
       title:"Date",
       dataIndex:'date',
-      render : (text) => <span>{moment(text).format('YYYY-MM-MM')}</span>,
+      render : (text) => <span>{moment(text).format('YYYY-MM-DD')}</span>,
     },
     {
       title:"Amount",
       dataIndex:'amount',
-      key:'amount'
     },
     {
       title:"Type",
       dataIndex:'type',
-      key:'type'
+
     },
     {
       title:"Category",
       dataIndex:'category',
-      key:'category'
+      
     },
     {
       title:"Referrence",
       dataIndex:'referrence',
-      key:'referrence'
+     
     },
     {
       title:"Action",
@@ -56,15 +58,16 @@ function Home() {
         const user = JSON.parse(localStorage.getItem('user'))
         setLoading(true)
         const res = await axios.post('/transactions/get-transaction', {
-           userId : user._id,
+          userId : user._id,
           frequency ,
           selectedDate,
           type,
         });
         setLoading(false)
         setAllTransaction(res.data)
+        console.log(res.data);
         
-      } 
+         } 
       catch (error) 
       {
         console.log(error)
@@ -95,16 +98,17 @@ function Home() {
   return (
     <Layout>
     {loading && <Spinne />}
+
         <div className='filter'>
           <div className='filters'>
             <h5>Filter Frequency</h5>
-            <Select value = { frequency } onChange={(values)=> setFrequency(values)} >
+            <Select value = {frequency} onChange={(values)=> setFrequency(values)} >
               <Select.Option value="7">Last 1  Week</Select.Option>
               <Select.Option value="30">Last 1 Month</Select.Option>
               <Select.Option value="365">Last 1 Year</Select.Option>
               <Select.Option value="custom">Customized</Select.Option>
             </Select>
-            { frequency == 'custom' && <RangePicker value={selectedDate} onChange={(values)=> setSelectedDate(values)} ></RangePicker>}
+            { frequency === 'custom' && <RangePicker value={selectedDate} onChange={(values)=> setSelectedDate(values)} ></RangePicker>}
           </div>
 
 
@@ -117,12 +121,19 @@ function Home() {
             </Select>
             { frequency == 'custom' && <RangePicker value={selectedDate} onChange={(values)=> setSelectedDate(values)} ></RangePicker>}
           </div>
+
+          <div className="switch-Icon">
+            <UnorderedListOutlined className={`mx-2 ${viewData === 'table' ? 'active-icon' : 'inactive-icon'}`} onClick={()=> setViewData('table')}></UnorderedListOutlined>
+            <AreaChartOutlined className={`mx-2 ${viewData === 'analytics' ? 'active-icon' : 'inactive-icon'}`} onClick={()=> setViewData('analytics')}></AreaChartOutlined>
+          </div>
+          
+          
           <div>
             <button className='btn btn-primary' onClick={()=> setShowModal(true)}>Add New </button>
           </div>
         </div>
         <div className='content'>
-        <Table columns={columns} dataSource={allTransaction}></Table>
+        {viewData === 'table' ? ( <Table columns={columns} dataSource={allTransaction}></Table>) : ( <Analytics allTransaction={allTransaction}></Analytics>)}
         </div>
         <Modal title="Add transaction" open={showModal}  onCancel={()=> setShowModal(false)} footer={false}>
           <Form layout="vertical" onFinish={handleSubmit}>
