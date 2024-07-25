@@ -3,8 +3,8 @@ import Layout from '../Layout/Layout'
 import axios from 'axios'
 import Spinne from '../Layout/Spinne'
 import moment from 'moment'
-import {DatePicker, Modal , Form , Input, Select, message, Table } from 'antd'
-import { UnorderedListOutlined , AreaChartOutlined} from '@ant-design/icons' 
+import { DatePicker, Modal , Form , Input, Select, message, Table } from 'antd'
+import {EditOutlined, DeleteOutlined, UnorderedListOutlined , AreaChartOutlined} from '@ant-design/icons' 
 import Analytics from '../Layout/Analytics'
 const { RangePicker } = DatePicker;
 
@@ -16,6 +16,7 @@ function Home() {
   const [ selectedDate , setSelectedDate ] = useState([])
   const [ type , setType] = useState('all')
   const [ viewData , setViewData ] = useState('table')
+  const [ editable , setEditable ] = useState(null)
   const columns = [
     {
       title:"Date",
@@ -42,7 +43,16 @@ function Home() {
      
     },
     {
-      title:"Action",
+      title:"Actions",
+      render:( text ,record )=> (
+        <div>
+         <EditOutlined onClick={() => { 
+          setEditable(record)
+           setShowModal(true)
+           }}/>
+          <DeleteOutlined className='mx-2'/>
+        </div>
+      )
     },
   ]
   
@@ -82,11 +92,30 @@ function Home() {
     try{
       const user = JSON.parse(localStorage.getItem('user'))
       setLoading(true)
-      await axios.post('/transactions/add-transaction', {...values,userId:user._id})
+      if(editable)
+      {
+        await axios.post("/transactions/edit-transaction", {
+          payload:{
+            ...values,
+            userId : user._id,
+          },
+          transactionId: editable._id
+        })
+        setLoading(false)
+        message.success("Transaction Updated Successfully !!");
+
+      }
+      else{
+        await axios.post("/transactions/edit-transaction",{
+          ...values,
+          userId : user._id,
+        })
       setLoading(false)
-      message.success("Transaction added successfully !!!")
-      setShowModal(false)
-      console.log(user);
+      message.success("Transaction Added Successfully !!")
+    }
+    setShowModal(false)
+    setEditable(null)
+    console.log(user);
     }
     catch(error)
     {
@@ -135,8 +164,8 @@ function Home() {
         <div className='content'>
         {viewData === 'table' ? ( <Table columns={columns} dataSource={allTransaction}></Table>) : ( <Analytics allTransaction={allTransaction}></Analytics>)}
         </div>
-        <Modal title="Add transaction" open={showModal}  onCancel={()=> setShowModal(false)} footer={false}>
-          <Form layout="vertical" onFinish={handleSubmit}>
+        <Modal title={editable ? 'Edit Transaction' : 'Add Transaction'} open={showModal}  onCancel={()=> setShowModal(false)} footer={false}>
+          <Form layout="vertical" onFinish={handleSubmit}  initialValues={editable}>
             <Form.Item label="Amount" name="amount">
               <Input type="text" />
             </Form.Item>
