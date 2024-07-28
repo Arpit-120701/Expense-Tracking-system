@@ -1,0 +1,28 @@
+.mainContainer{
+    background-image: url('../Assets/expWall3.jpg');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    width: 100%;
+    height: 800px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.register-page{
+    background-color: aliceblue;
+    height: 400px;
+    width:500px;
+    border-radius: 8px;
+    margin-left: 20px;
+}
+.heading{
+  font-size: 6.0rem;  
+  color: white;
+}
+.hr{
+    color: white;
+    width:95%;
+    background-color: white;
+    height: 20px;
+}

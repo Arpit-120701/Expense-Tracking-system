@@ -6,6 +6,8 @@ import moment from 'moment'
 import { DatePicker, Modal , Form , Input, Select, message, Table } from 'antd'
 import {EditOutlined, DeleteOutlined, UnorderedListOutlined , AreaChartOutlined} from '@ant-design/icons' 
 import Analytics from '../Layout/Analytics'
+import Navbar from '../Layout/Navbar'
+import '../../CSS/Home.css'
 const { RangePicker } = DatePicker;
 
 function Home() {
@@ -50,7 +52,7 @@ function Home() {
           setEditable(record)
            setShowModal(true)
            }}/>
-          <DeleteOutlined className='mx-2'/>
+          <DeleteOutlined className='mx-2' onClick={()=> {handelDelete(record)}}/>
         </div>
       )
     },
@@ -87,6 +89,21 @@ function Home() {
     getAlltransactions();
   }, [frequency , selectedDate, type ])
   //Showinhg data in table
+
+
+  const handelDelete = async (record) => {
+    try{
+      setLoading(true)
+      await axios.post("/transactions/delete-transaction", {transactionId :record._id})
+      setLoading(false)
+      message.success("Transaction Deleted !!")
+    }
+    catch(error)
+    {
+
+    }
+
+  }
   
   const handleSubmit = async(values)=>{
     try{
@@ -125,6 +142,9 @@ function Home() {
       
   }
   return (
+    <>
+    <Navbar></Navbar>
+    <div className='display'>
     <Layout>
     {loading && <Spinne />}
 
@@ -203,6 +223,8 @@ function Home() {
           </Form>
         </Modal>
     </Layout>
+    </div>
+    </>
   )
 }
 

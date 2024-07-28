@@ -3,6 +3,9 @@ import {Form , Input ,  message } from 'antd'
 import { Link , useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import Spinne from '../Layout/Spinne'
+import Navbar from '../Layout/Navbar'
+import '../../CSS/Login.css'
+import Footer from '../Layout/Footer'
 
 function Login() {
     const navigate = useNavigate()
@@ -34,6 +37,13 @@ function Login() {
 
   return (
     <>
+    <Navbar></Navbar>
+    <div className='mainContainer'>
+    <div className='heading'>
+      <p><b>EXPENSO APP</b></p>
+      <hr className='hr'  ></hr>
+      <p style={{fontSize:"1.7rem",color:"white"}}><b>"Effortlessly track, manage, and save your <br></br>finances with Expnse – your  ultimate companion<br></br> for smarter spending and budgeting."</b></p>
+    </div>
      <div className='register-page'>
      {
         loading && <Spinne></Spinne>
@@ -52,6 +62,8 @@ function Login() {
         </div>
       </Form>
     </div>
+    </div>
+    <Footer></Footer>
     </>
   )
 }
